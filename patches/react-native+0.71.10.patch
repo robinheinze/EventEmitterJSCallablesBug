@@ -1,0 +1,34 @@
+diff --git a/node_modules/react-native/React/Modules/RCTEventEmitter.m b/node_modules/react-native/React/Modules/RCTEventEmitter.m
+index 568c773..f2247d3 100644
+--- a/node_modules/react-native/React/Modules/RCTEventEmitter.m
++++ b/node_modules/react-native/React/Modules/RCTEventEmitter.m
+@@ -14,6 +14,8 @@
+ @implementation RCTEventEmitter {
+   NSInteger _listenerCount;
+   BOOL _observationDisabled;
++
++    @private NSString *__ID;
+ }
+ 
+ @synthesize callableJSModules = _callableJSModules;
+@@ -93,7 +95,19 @@ - (BOOL)canSendEvents_DEPRECATED
+ 
+ - (void)startObserving
+ {
+-  // Does nothing
++    dispatch_async(dispatch_get_main_queue(), ^{
++		self->__ID = [[NSProcessInfo processInfo] globallyUniqueString];
++        [NSTimer scheduledTimerWithTimeInterval:1
++                                         target:self
++                                       selector:@selector(printCallableJSModules:)
++                                       userInfo:nil
++                                        repeats:YES];
++    });
++}
++
++- (void) printCallableJSModules:(NSTimer*)timer
++{
++    NSLog(@"INIT callableJSModules %@ -- %i", __ID, [self callableJSModules] != nil);
+ }
+ 
+ - (void)stopObserving
